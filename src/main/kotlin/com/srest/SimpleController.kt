@@ -1,4 +1,4 @@
-package com.srest.controller
+package com.srest
 
 import com.srest.framework.util.Controller
 
