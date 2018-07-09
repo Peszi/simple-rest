@@ -1,6 +1,6 @@
 package com.srest.framework.request
 
-internal class Request(
+class Request(
         val method: HttpMethod,
         val endpoint: HttpEndpoint
 ) {

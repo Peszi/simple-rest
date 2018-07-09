@@ -1,6 +1,6 @@
 package com.srest.framework.request
 
-internal enum class HttpMethod {
+enum class HttpMethod {
 
     GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
 

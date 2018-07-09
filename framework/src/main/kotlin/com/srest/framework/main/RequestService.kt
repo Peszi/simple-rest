@@ -9,16 +9,13 @@ import java.net.ServerSocket
 import java.net.Socket
 
 internal class RequestService(
-        serverPort: Int
+        serverPort: Int,
+        val dependencyManager: DependencyManager
 ) {
 
     private val serverSocket: ServerSocket = ServerSocket(serverPort)
 
-    init {
-        requestLoop()
-    }
-
-    private fun requestLoop() {
+    fun beginListening() {
         while (true) {
             val client = serverSocket.accept()
             processRequest(client)
@@ -56,7 +53,12 @@ internal class RequestService(
         RequestLogger.log.info("Request METHOD " + request.method.name)
         RequestLogger.log.info("Request ENDPOINT " + request.endpoint.layers.map{ "'$it'" })
 
-        return Response(ContentType.HTML_TYPE, "<html><p>data</p></html>")
+        val responseText = dependencyManager.getData(request)
+        RequestLogger.log.info("> " + responseText)
+
+        if (responseText != null)
+            return Response(ContentType.HTML_TYPE, responseText)//"<html><p>data</p></html>")
+        return Response(ContentType.HTML_TYPE, "<html><p>404 not found</p></html>")
     }
 
 }

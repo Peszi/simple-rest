@@ -2,9 +2,9 @@ package com.srest
 
 import com.srest.framework.RestFramework
 
-class ExampleBackend
+class AppBackend
 
 fun main(args: Array<String>) {
-    RestFramework.runFramework<ExampleBackend>()
+    RestFramework.runFramework<AppBackend>()
 }
 

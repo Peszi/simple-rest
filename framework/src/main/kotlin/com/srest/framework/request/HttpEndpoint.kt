@@ -1,8 +1,14 @@
 package com.srest.framework.request
 
-internal class HttpEndpoint(
+class HttpEndpoint(
         val layers: List<String>
 ) {
+
+    fun getEndpoint(): String {
+        var endpoint = ""
+        layers.forEach { endpoint += "/$it" }
+        return endpoint
+    }
 
     companion object {
 
