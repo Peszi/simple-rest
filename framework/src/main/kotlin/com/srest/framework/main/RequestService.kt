@@ -3,7 +3,7 @@ package com.srest.framework.main
 import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
-import com.srest.framework.util.RequestLogger
+import com.srest.framework.util.Logger
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
@@ -32,7 +32,7 @@ internal class RequestService(
             outputBuffer.close()
             inputBuffer.close()
         } catch (e: IOException) {
-            RequestLogger.log.error("cannot read request data!")
+            Logger.log.error("cannot read request data!")
         }
     }
 
@@ -44,17 +44,14 @@ internal class RequestService(
             if (line == null || line.isEmpty()) break
             request.appendHeader(line)
         }
-        RequestLogger.log.info("read full request!")
         return request
     }
 
     private fun prepareResponse(request: Request): Response {
-        // TODO
-        RequestLogger.log.info("Request METHOD " + request.method.name)
-        RequestLogger.log.info("Request ENDPOINT " + request.endpoint.layers.map{ "'$it'" })
+        Logger.log.info("got request [${request.method}] '${request.endpoint.getEndpoint()}'")
 
         val responseText = dependencyManager.getData(request)
-        RequestLogger.log.info("> " + responseText)
+        Logger.log.info("sending response '${responseText ?: "NULL"}'")
 
         if (responseText != null)
             return Response(ContentType.HTML_TYPE, responseText)//"<html><p>data</p></html>")

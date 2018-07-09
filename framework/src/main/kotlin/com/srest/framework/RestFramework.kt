@@ -3,7 +3,7 @@ package com.srest.framework
 import com.srest.framework.main.DependencyManager
 import com.srest.framework.main.RequestService
 import com.srest.framework.properties.PropertiesService
-import com.srest.framework.util.RequestLogger
+import com.srest.framework.util.Logger
 import kotlin.reflect.KClass
 
 class RestFramework(
@@ -17,14 +17,13 @@ class RestFramework(
 
 
     fun start() {
+        Logger.log.info("listening started on :${propertiesService.getServerPort()}")
         requestService.beginListening()
-        RequestLogger.log.info("Framework is started!")
     }
 
     companion object {
         inline fun <reified T : kotlin.Any> runFramework() {
-            val restFramework = RestFramework(T::class)
-            restFramework.start()
+            RestFramework(T::class).start()
         }
     }
 }

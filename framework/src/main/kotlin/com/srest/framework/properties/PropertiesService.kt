@@ -1,6 +1,6 @@
 package com.srest.framework.properties
 
-import com.srest.framework.util.RequestLogger.log
+import com.srest.framework.util.Logger.log
 import java.io.File
 import java.io.FileInputStream
 import java.util.*

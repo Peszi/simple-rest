@@ -5,6 +5,7 @@ import com.srest.framework.util.RequestMapping
 import java.lang.reflect.Method
 
 class DependencyEntity(
+        val endpoint: String,
         private val dependency: Any,
         private val methods: Map<String, MethodEntry>
 ) {

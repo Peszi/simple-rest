@@ -5,9 +5,7 @@ class HttpEndpoint(
 ) {
 
     fun getEndpoint(): String {
-        var endpoint = ""
-        layers.forEach { endpoint += "/$it" }
-        return endpoint
+        var endpoint = ""; layers.forEach { endpoint += "/$it" }; return endpoint
     }
 
     companion object {
