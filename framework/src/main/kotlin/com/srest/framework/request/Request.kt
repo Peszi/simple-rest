@@ -2,13 +2,13 @@ package com.srest.framework.request
 
 class Request(
         val method: HttpMethod,
-        val endpoint: HttpEndpoint
+        val endpoint: HttpEndpoint,
+        val headers: MutableMap<String, String> = mutableMapOf()
 ) {
 
     fun appendHeader(headerLine: String) {
-//        println(headerLine)
-//        val headerParams = headerLine.split(" ")
-
+        val headerParams = headerLine.split(" ")
+        headers[headerParams[0].substring(0, headerParams[0].length-1)] = headerParams[1]
     }
 
     companion object {

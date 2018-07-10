@@ -7,23 +7,25 @@ import java.lang.reflect.Method
 class DependencyEntity(
         val endpoint: String,
         private val dependency: Any,
-        private val methods: Map<String, MethodEntry>
+        private val methods: List<MethodEntry>
 ) {
 
-    fun invoke(endpoint: String): Any? {
-        return methods.get(endpoint)?.methodExecutor?.invoke(
-                dependency
-        ) ?: return null
+    fun getMethodResult(endpoint: String): Any? {
+        methods.filter {
+            endpoint.equals(it.mapping, true) || (it.suffix && endpoint.startsWith(it.mapping))
+        }.forEach { return it.methodExecutor.invoke(dependency) ?: null }
+        return null
     }
 }
 
 class MethodEntry(
+        val mapping: String,
+        val suffix: Boolean,
         val httpMethod: HttpMethod,
         val methodExecutor: Method
 ) {
     companion object {
-        fun build(method: Method, methodAnnotation: RequestMapping) = MethodEntry(
-                methodAnnotation.method, method
-        )
+        fun build(method: Method, methodAnnotation: RequestMapping) =
+                MethodEntry(methodAnnotation.location, methodAnnotation.suffix, methodAnnotation.method, method)
     }
 }

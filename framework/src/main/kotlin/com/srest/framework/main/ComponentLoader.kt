@@ -5,17 +5,17 @@ import com.srest.framework.MethodEntry
 import com.srest.framework.util.Logger
 import com.srest.framework.util.RequestMapping
 
-object RestInitializer {
+object ComponentLoader {
 
     @JvmStatic
     fun loadControllers(controllers: Set<Class<*>>): List<DependencyEntity> {
         val controllersMap = mutableListOf<DependencyEntity>()
         controllers.forEach {
-            val methods = mutableMapOf<String, MethodEntry>()
+            val methods = mutableListOf<MethodEntry>()
             it.declaredMethods.filter { it.isAnnotationPresent(RequestMapping::class.java)}.forEach {
                 val methodAnnotation = it.getAnnotation(RequestMapping::class.java)
                 Logger.log.info("binding request [${methodAnnotation.method.name}] '${methodAnnotation.location}'")
-                methods[methodAnnotation.location] = MethodEntry.build(it, methodAnnotation)
+                methods.add(MethodEntry.build(it, methodAnnotation))
             }
             controllersMap.add(DependencyEntity("", it.newInstance(), methods)) // TODO endpoints
         }

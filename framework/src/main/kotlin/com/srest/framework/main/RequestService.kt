@@ -4,13 +4,14 @@ import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
 import com.srest.framework.util.Logger
+import com.srest.framework.util.Pages
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
 
 internal class RequestService(
         serverPort: Int,
-        val dependencyManager: DependencyManager
+        val responseManager: ResponseManager
 ) {
 
     private val serverSocket: ServerSocket = ServerSocket(serverPort)
@@ -36,8 +37,8 @@ internal class RequestService(
         }
     }
 
-    private fun getRequest(inputBuffer: BufferedReader): Request {
-        var line = inputBuffer.readLine()
+    private fun getRequest(inputBuffer: BufferedReader): Request? {
+        var line = inputBuffer.readLine() ?: return null
         val request = Request.build(line)
         while (true) {
             line = inputBuffer.readLine()
@@ -47,15 +48,18 @@ internal class RequestService(
         return request
     }
 
-    private fun prepareResponse(request: Request): Response {
-        Logger.log.info("got request [${request.method}] '${request.endpoint.getEndpoint()}'")
-
-        val responseText = dependencyManager.getData(request)
-        Logger.log.info("sending response '${responseText ?: "NULL"}'")
-
-        if (responseText != null)
-            return Response(ContentType.HTML_TYPE, responseText)//"<html><p>data</p></html>")
-        return Response(ContentType.HTML_TYPE, "<html><p>404 not found</p></html>")
+    private fun prepareResponse(request: Request?): Response {
+        if (request != null) {
+            Logger.log.info("got request [${request.method}] '${request.endpoint.getEndpoint()}'")
+            if (request.headers["User-Agent"] != null) {
+                // Web request
+                return Response(ContentType.HTML_TYPE, responseManager.getWebResponse(request) ?: Pages.NOT_FOUND)
+            } else {
+                return Response(ContentType.JSON_TYPE, responseManager.getResponse(request) ?: Pages.NOT_FOUND)
+            }
+        }
+        Logger.log.warn("corrupted request!")
+        return Response(ContentType.HTML_TYPE, Pages.NOT_FOUND)
     }
 
 }

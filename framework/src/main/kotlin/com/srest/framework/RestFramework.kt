@@ -1,6 +1,6 @@
 package com.srest.framework
 
-import com.srest.framework.main.DependencyManager
+import com.srest.framework.main.ResponseManager
 import com.srest.framework.main.RequestService
 import com.srest.framework.properties.PropertiesService
 import com.srest.framework.util.Logger
@@ -10,10 +10,10 @@ class RestFramework(
         baseClass: KClass<*>
 ) {
 
-    private val dependencyManager: DependencyManager = DependencyManager(baseClass)
+    private val responseManager: ResponseManager = ResponseManager(baseClass)
     private val propertiesService: PropertiesService = PropertiesService()
 
-    private val requestService: RequestService = RequestService(propertiesService.getServerPort(), dependencyManager)
+    private val requestService: RequestService = RequestService(propertiesService.getServerPort(), responseManager)
 
 
     fun start() {
