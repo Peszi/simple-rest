@@ -1,5 +1,6 @@
 package com.srest.framework.annotation
 
+import com.srest.framework.annotation.web.ChildComponent
 import com.srest.framework.util.Controller
 
 @Target(AnnotationTarget.CLASS)
@@ -7,5 +8,6 @@ import com.srest.framework.util.Controller
 @Controller
 annotation class WebComponent(
         val htmlFile: String,
-        val jsFile: String = ""
+        val jsFile: String = "",
+        val childComponents: Array<ChildComponent> = []
 )

@@ -11,7 +11,7 @@ import java.net.Socket
 
 internal class RequestService(
         serverPort: Int,
-        val requestListener: RequestListener
+        private val requestListener: RequestListener
 ) {
 
     private val serverSocket: ServerSocket = ServerSocket(serverPort)

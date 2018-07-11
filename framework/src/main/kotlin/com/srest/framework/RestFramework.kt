@@ -1,8 +1,7 @@
 package com.srest.framework
 
-import com.srest.framework.main.DependencyManager
+import com.srest.framework.main.DependencyService
 import com.srest.framework.main.RequestListener
-import com.srest.framework.main.ResponseService
 import com.srest.framework.main.RequestService
 import com.srest.framework.properties.PropertiesService
 import com.srest.framework.request.Request
@@ -12,20 +11,15 @@ import kotlin.reflect.KClass
 
 class RestFramework(
         baseClass: KClass<*>
-): RequestListener {
+) {
 
     private val propertiesService: PropertiesService = PropertiesService()
-    private val dependencyManager: DependencyManager = DependencyManager(baseClass)
-    private val requestService: RequestService = RequestService(propertiesService.getServerPort(), this)
+    private val dependencyService: DependencyService = DependencyService(baseClass)
+    private val requestService: RequestService = RequestService(propertiesService.getServerPort(), dependencyService)
 
     fun start() {
         Logger.log.info("listening started on :${propertiesService.getServerPort()}")
         requestService.beginListening()
-    }
-
-    override fun onResponse(request: Request): Response {
-        Logger.log.info("got request [${request.method}] '${request.endpoint.getEndpoint()}'")
-        return ResponseService.getResponseResult(request)
     }
 
     companion object {

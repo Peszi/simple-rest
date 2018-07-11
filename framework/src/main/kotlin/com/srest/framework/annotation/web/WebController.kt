@@ -8,5 +8,5 @@ import com.srest.framework.util.Controller
 annotation class WebController(
         val url: String,
         val dir: String,
-        val childComponents: Array<ChildComponent> = arrayOf()
+        val childComponents: Array<ChildComponent> = []
 )
