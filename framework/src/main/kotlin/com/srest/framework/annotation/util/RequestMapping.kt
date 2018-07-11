@@ -6,6 +6,6 @@ import com.srest.framework.request.HttpMethod
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RequestMapping(
         val method: HttpMethod,
-        val location: String = "",
+        val mapping: String = "",
         val suffix: Boolean = false
 )

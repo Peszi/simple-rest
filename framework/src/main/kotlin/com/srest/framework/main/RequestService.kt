@@ -11,7 +11,7 @@ import java.net.Socket
 
 internal class RequestService(
         serverPort: Int,
-        val responseManager: ResponseManager
+        val requestListener: RequestListener
 ) {
 
     private val serverSocket: ServerSocket = ServerSocket(serverPort)
@@ -49,17 +49,12 @@ internal class RequestService(
     }
 
     private fun prepareResponse(request: Request?): Response {
-        if (request != null) {
-            Logger.log.info("got request [${request.method}] '${request.endpoint.getEndpoint()}'")
-            if (request.headers["User-Agent"] != null) {
-                // Web request
-                return Response(ContentType.HTML_TYPE, responseManager.getWebResponse(request) ?: Pages.NOT_FOUND)
-            } else {
-                return Response(ContentType.JSON_TYPE, responseManager.getResponse(request) ?: Pages.NOT_FOUND)
-            }
-        }
+        if (request != null) return requestListener.onResponse(request)
         Logger.log.warn("corrupted request!")
-        return Response(ContentType.HTML_TYPE, Pages.NOT_FOUND)
+        return Response(ContentType.HTML_TYPE, Pages.NOT_FOUND) // TODO incorrect request
     }
+}
 
+internal interface RequestListener {
+    fun onResponse(request: Request): Response
 }

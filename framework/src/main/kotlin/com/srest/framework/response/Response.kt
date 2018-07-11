@@ -3,7 +3,7 @@ package com.srest.framework.response
 import com.srest.framework.response.ResponseConstants.SERVER_NAME
 import java.io.BufferedWriter
 
-internal class Response(
+class Response(
         val contentType: String,
         val contentData: String
 ) {
