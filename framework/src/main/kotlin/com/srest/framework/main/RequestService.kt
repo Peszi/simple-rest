@@ -51,7 +51,7 @@ internal class RequestService(
     private fun prepareResponse(request: Request?): Response {
         if (request != null) return requestListener.onResponse(request)
         Logger.log.warn("corrupted request!")
-        return Response(ContentType.HTML_TYPE, Pages.NOT_FOUND) // TODO incorrect request
+        return Response(ContentType.HTML_TYPE, Pages.PAGE_NOT_FOUND) // TODO incorrect request
     }
 }
 

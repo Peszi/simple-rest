@@ -1,9 +1,8 @@
 package com.srest.framework.main
 
 import com.srest.framework.annotation.Component
-import com.srest.framework.annotation.WebComponent
-import com.srest.framework.annotation.web.ChildComponent
 import com.srest.framework.annotation.web.WebController
+import com.srest.framework.request.HttpMethod
 import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
@@ -22,16 +21,20 @@ internal class DependencyService(
 
     init {
         ClassInjector.scanForClasses(baseClass).forEach { lookupComponent(it) }
-        beansBuffer.forEach{ Logger.log.info("Component injected '${it.value::class.simpleName}'") }
-        controllerHandlers.forEach { Logger.log.info("Request bind [${it.httpMethod.name}] '${it.mapping}'") }
 
         webPagesBuffer.forEach{
-            val pageName = it.key
-            PageInitializer.getPageEndpoints(beansBuffer, it.key, it.value.childComponents).forEach {
-                webControllerHandlers.add(WebEntry(pageName, it)) // TODO web entry class
-                Logger.log.info("> $it")
+            val pageName = it.key; val webPage = it.value
+            webControllerHandlers.add(WebEntry(pageName, pageName))
+            PageInitializer.getPageEndpoints(pageName, webPage).forEach {
+                webPage.addComponent(it)
+                webControllerHandlers.add(WebEntry(pageName, it.endpoint))
             }
         }
+
+        beansBuffer.forEach{ Logger.log.info("Component injected '${it.value::class.simpleName}'") }
+        controllerHandlers.forEach { Logger.log.info("Request bind [${it.httpMethod.name}] '${it.mapping}'") }
+        webControllerHandlers.forEach { Logger.log.info("Request bind [WEB] '${it.endpoint}'") }
+        webPagesBuffer.forEach { Logger.log.info("Web page '${it.key}' '${it.value.dir}'") }
     }
 
     // Init
@@ -40,22 +43,14 @@ internal class DependencyService(
         if (ClassInjector.isAnnotated(objectClass, Component::class)) {
             beansBuffer[objectClass.simpleName] = objectClass.newInstance()
         }
-        // Store mapping handlers
+        // Store endpoint handlers
         if (ClassInjector.isAnnotated(objectClass, Controller::class)) {
             controllerHandlers.addAll(UrlMapper.getMappingHandlers(objectClass))
         }
         // Store web controllers and mappings
         if (ClassInjector.isAnnotated(objectClass, WebController::class)) {
             val webController = objectClass.getAnnotation(WebController::class.java)
-            webPagesBuffer[webController.url] = WebPage.build(webController, webController.childComponents)
-            Logger.log.info("Web " + objectClass.canonicalName)
-            //
-
-
-            // Add webControllerHandlers
-
-            // Add controllerHandlers
-            // if not exists create data endpoints
+            webPagesBuffer[webController.url] = WebPage.build(objectClass.simpleName, webController)
         }
     }
 
@@ -70,10 +65,18 @@ internal class DependencyService(
             if (bean != null) return ClassInjector.invokeMethodResult(bean, handler.method)
         }
         // Web controllers
-
+        webControllerHandlers.firstOrNull { it.endpoint == endpoint }.let {
+            if (it == null) return@let
+            val webPage = webPagesBuffer[it.page] ?: return@let
+            return if (request.method == HttpMethod.GET) webPage.getWebPageResponse(endpoint) else webPage.getComponentResponse(endpoint)
+        }
+        // Framework JS
+        if (request.method == HttpMethod.GET && endpoint == "/framework.js") {
+            return Response(ContentType.HTML_TYPE, FileReader.loadFileText("web/framework.js") ?: "alert('no framework')")
+        }
         // lookup TODO
-
-        return Response(ContentType.HTML_TYPE, Pages.NOT_FOUND)
+        Logger.log.warn("cannot find response!")
+        return Response(ContentType.HTML_TYPE, Pages.PAGE_NOT_FOUND)
     }
 
     fun getBean(name: String): Any {

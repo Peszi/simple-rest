@@ -1,32 +1,23 @@
 package com.srest.framework.main
 
-import com.srest.framework.annotation.WebComponent
 import com.srest.framework.annotation.web.ChildComponent
-import kotlin.reflect.KClass
 
 internal object PageInitializer {
 
-    fun getPageEndpoints(beans: Map<String, Any>, url: String, childComponents: Array<ChildComponent>): List<String> {
-        val endpoints = mutableListOf(url)
-        fun getChildComponents(component: KClass<*>, url: String){
-            val bean = beans[component.simpleName]?.javaClass
-            val beanController = bean?.getAnnotation(WebComponent::class.java)
-            beanController?.childComponents?.forEach {
-                val path = url + it.mapping
-                endpoints.add(path)
-                getChildComponents(it.component, path)
+    fun getPageEndpoints(endpoint: String, webPage: WebPage): List<ComponentEntry> {
+        val components = mutableListOf<ComponentEntry>() // ComponentEntry(endpoint, "", "")
+        fun getChildComponents(childComponents: Array<ChildComponent>, url: String){
+            childComponents.forEach {
+                val endpoint = url + it.mapping
+                components.add(ComponentEntry.build(endpoint, it))
+                getChildComponents(it.childComponents, endpoint)
             }
         }
-        childComponents.forEach {
-            val path = url + it.mapping
-            endpoints.add(path)
-            getChildComponents(it.component, path)
-        }
-        return endpoints
+        getChildComponents(webPage.childComponents, endpoint)
+        return components
     }
 
-    fun loadWebPage() {
-
+    fun setupPageLinks(pageData: String) {
+//        pageData.inde
     }
-
 }

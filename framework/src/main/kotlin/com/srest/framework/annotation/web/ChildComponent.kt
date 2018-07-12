@@ -8,5 +8,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 annotation class ChildComponent(
         val mapping: String,
-        val component: KClass<*>
+        val htmlFile: String,
+        val component: KClass<*>,
+        val childComponents: Array<ChildComponent> = []
 )

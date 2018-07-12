@@ -12,20 +12,20 @@
     <body>
         <div class="container my-3">
             <div class="row justify-content-center">
-                <div class="col-4">
+                <div class="col-6">
                     <div class="card">
                         <div class="row mx-2 py-2 border-bottom">
-                            <a class="col-4 btn btn-sm btn-primary" href="/web"> home </a>
-                            <a class="col-4 btn btn-sm btn-primary" href="/web/user"> user </a>
-                            <a class="col-4 btn btn-sm btn-primary" href="/web/spring"> spring </a>
+                            <a class="col-4 btn btn-sm btn-primary" href="/" onclick="navigateTo(event)"> home </a>
+                            <a class="col-4 btn btn-sm btn-primary" href="/user" onclick="navigateTo(event)"> user </a>
+                            <a class="col-4 btn btn-sm btn-primary" href="/spring" onclick="navigateTo(event)"> spring </a>
                         </div>
                         <div class="row justify-content-center mx-2 mb-2">
-                            <outlet urls="[user, spring]"></outlet>
+                            <outlet url="" current=""></outlet>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <script src="/framework.js"></script>
     </body>
-    <script type="text/javascript">#{baseScript}</script>
 </html>
