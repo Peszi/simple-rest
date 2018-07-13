@@ -1,7 +1,16 @@
-<div class="m-1 rounded border p-2">
-    <p class="my-1">User component works! {{ data }}</p>
-    <outlet url="user/" current=""></outlet>
-    <a class="col-4 btn btn-sm btn-primary" href="/user/john" onclick="navigateTo(event)"> john </a>
-    <a class="col-4 btn btn-sm btn-primary" href="/user/bob" onclick="navigateTo(event)"> bob </a>
-    <a class="col-4 btn btn-sm btn-primary" href="/user/dick" onclick="navigateTo(event)"> dick </a>
+<div class="rounded border p-2">
+    <p class="mb-2 text-center">User component works!</p>
+    <div class="row" style="margin-left: -0.25rem; margin-right: -0.25rem">
+        <div class="col-4 px-1">
+            <a class="btn btn-block btn-sm btn-primary" href="/user/john" onclick="navigateTo(event)">john</a>
+        </div>
+        <div class="col-4 px-1">
+            <a class="btn btn-block btn-sm btn-primary" href="/user/bob" onclick="navigateTo(event)">bob</a>
+        </div>
+        <div class="col-4 px-1">
+            <a class="btn btn-block btn-sm btn-primary" href="/user/dick" onclick="navigateTo(event)">dick</a>
+        </div>
+    </div>
+    <div></div>
+    <outlet class="mt-2" url="user/" current=""></outlet>
 </div>

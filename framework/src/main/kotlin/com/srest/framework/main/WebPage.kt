@@ -5,7 +5,7 @@ import com.srest.framework.annotation.web.WebController
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
 import com.srest.framework.util.FileReader
-import com.srest.framework.util.Pages
+import com.srest.framework.util.PageData
 
 const val LIVE_RELOAD = true
 
@@ -41,8 +41,8 @@ internal class WebPage(
     }
 
     private fun getComponentData(endpoint: String): String { // TODO
-        if (LIVE_RELOAD && components[endpoint] != null) return loadComponentFile(components[endpoint]!!) ?: "<div>component file not exists!</div>"
-        return componentsBuffer[endpoint] ?: Pages.getComponentNotFoundPage(endpoint)
+        if (LIVE_RELOAD && components[endpoint] != null) return loadComponentFile(components[endpoint]!!) ?: PageData.getEmptyComponent(components[endpoint]!!)
+        return componentsBuffer[endpoint] ?: PageData.getComponentNotFoundPage(endpoint)
     }
 
     // Load from file

@@ -1,10 +1,14 @@
 package com.srest.framework.util
 
+import com.srest.framework.main.MethodEntry
+import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
+import com.srest.framework.response.ResponseParams
 import java.io.File
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 internal object ClassInjector {
 
@@ -46,11 +50,15 @@ internal object ClassInjector {
     }
 
     @JvmStatic
-    fun invokeMethodResult(bean: Any, method: Method): Response {
-        val result = method.invoke(bean) // TODO args
-        if (result is String) return Response(ContentType.HTML_TYPE, result)
+    fun invokeMethodForResponse(bean: Any, handler: MethodEntry, request: Request): Response {
+        val responseParams = handler.toResponseParams()
+        val arguments = mutableListOf<Any>()
+        handler.method.parameters.filter { it.type == Request::class.java }.forEach { arguments.add(request) }
+        handler.method.parameters.filter { it.type == ResponseParams::class.java }.forEach { arguments.add(responseParams) }
+        val result = handler.method.invoke(bean, *arguments.toTypedArray()) // TODO args
+        if (result is String) return Response(responseParams.contentType, result)
         // map object to Json
-        return Response(ContentType.JSON_TYPE, "{ \"error\": \"json not supported\" }")
+        return Response(handler.requestContentType, "{ \"error\": \"json not supported\" }")
     }
 
 }

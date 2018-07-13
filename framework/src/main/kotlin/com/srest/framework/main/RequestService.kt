@@ -4,7 +4,7 @@ import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
 import com.srest.framework.util.Logger
-import com.srest.framework.util.Pages
+import com.srest.framework.util.PageData
 import java.io.*
 import java.net.ServerSocket
 import java.net.Socket
@@ -38,6 +38,14 @@ internal class RequestService(
     }
 
     private fun getRequest(inputBuffer: BufferedReader): Request? {
+//        val charBuffer = mutableListOf<Char>()
+//        while (true) {
+//            val char = inputBuffer.read(); if (char < 0) break
+//            charBuffer.add(char.toChar())
+//            if (char == 13) {
+//                print(String(charBuffer.toCharArray())); charBuffer.clear()
+//            }
+//        }
         var line = inputBuffer.readLine() ?: return null
         val request = Request.build(line)
         while (true) {
@@ -51,7 +59,7 @@ internal class RequestService(
     private fun prepareResponse(request: Request?): Response {
         if (request != null) return requestListener.onResponse(request)
         Logger.log.warn("corrupted request!")
-        return Response(ContentType.HTML_TYPE, Pages.PAGE_NOT_FOUND) // TODO incorrect request
+        return Response(ContentType.HTML_TYPE, PageData.PAGE_NOT_FOUND) // TODO incorrect request
     }
 }
 
