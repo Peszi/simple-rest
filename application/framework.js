@@ -8,6 +8,24 @@ function navigateTo(event) {
     }
 }
 
+var varw = (function (context) {
+    return function (varName, varValue) {
+        var value = varValue;
+
+        Object.defineProperty(context, varName, {
+            get: function () { return value; },
+            set: function (v) {
+                value = v;
+                console.log('Value changed! New value: ' + value);
+            }
+        });
+    };
+})(window);
+
+function onButton(event) {
+    alert('root');
+}
+
 function loadComponents() {
     const outlets = document.getElementsByTagName("outlet");
     for (let outlet of outlets) {
@@ -16,7 +34,7 @@ function loadComponents() {
         const component = getComponentPathname(url);
         /*console.log("outlet [" + url + "] " + component + " to " + window.location.href);*/
         if (component.length > 0 && component !== url) {
-            console.log("current [" + component + "] '" + current + "' url '" + url + "'");
+            /*console.log("current [" + component + "] '" + current + "' url '" + url + "'");*/
             if (component !== current) {
                 downloadComponent(outlet, component);
             }
@@ -29,14 +47,24 @@ function loadComponents() {
 loadComponents();
 function downloadComponent(component, path) {
     const myRequest = new Request(getUrl(path), {method: 'POST'});
-    console.log("Component request '" + path + "'");
+    /*console.log("Component request '" + path + "'");*/
     return fetch(myRequest)
         .then(response => response.text())
         .then(response => {
-            component.innerHTML = response;
+            appendData(component, response);
             component.setAttribute("current", path);
             loadComponents();
         })
+}
+
+function appendData(component, response) {
+    component.innerHTML = response;
+    for (let script of component.getElementsByTagName('script')) {
+        script.parentNode.removeChild(script);
+        const scriptNode = document.createElement('script');
+        scriptNode.innerHTML = script.innerHTML;
+        component.appendChild(scriptNode);
+    }
 }
 
 function printComponents() {

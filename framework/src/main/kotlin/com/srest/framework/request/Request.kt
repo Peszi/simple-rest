@@ -2,7 +2,7 @@ package com.srest.framework.request
 
 class Request(
         val method: HttpMethod,
-        val endpoint: HttpEndpoint,
+        val endpoint: String,
         val headers: MutableMap<String, String> = mutableMapOf()
 ) {
 
@@ -16,8 +16,7 @@ class Request(
         fun build(requestHeader: String): Request {
             val requestType = requestHeader.split(" ")
             return Request(
-                    HttpMethod.getMethod(requestType[0]),
-                    HttpEndpoint.build(requestType[1])
+                    HttpMethod.getMethod(requestType[0]), requestType[1]
             )
         }
     }
