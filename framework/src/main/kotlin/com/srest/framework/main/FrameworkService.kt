@@ -11,6 +11,7 @@ import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
 import com.srest.framework.util.*
+import sun.rmi.runtime.Log
 import kotlin.reflect.KClass
 
 internal class FrameworkService(
@@ -39,8 +40,7 @@ internal class FrameworkService(
         // Controllers
         beansMappers
                 .firstOrNull { it.requestEndpoint == request.endpoint && it.requestMethod == request.method }
-                ?.run {
-                    val methodEntry = this
+                ?.run { val methodEntry = this
                     beansBuffer[this.bean]
                             ?.let { return ClassInjector.invokeMethod(it, methodEntry, request) }
                             ?: Logger.log.warn("cannot get ${this.bean} bean!")

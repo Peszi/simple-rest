@@ -1,4 +1,45 @@
 
+var onInitEvent = new Event('onInit');
+var onDestroyEvent = new Event('onDestroy');
+
+function defineVal(name, value) {
+    Object.defineProperty(window, name, {
+        configurable: true,
+        value: value
+    });
+}
+
+function registerVal(varName, varComponent, prefix, suffix) {
+    console.log("Setting up VAR " + varName);
+    let value = window[varName];
+    let component = varComponent;
+    component.innerText = prefix + value + suffix;
+    Object.defineProperty(window, varName, {
+        get: function () { return value; },
+        set: function (v) { value = v;
+            component.innerText = prefix + value + suffix;
+        }
+    });
+}
+
+function checkVariables(component) {
+    $(component).find('*').each(function () {
+        if (this.nodeName === 'OUTLET') { return; }
+        const innerText = this.childNodes[0].nodeValue;
+        if (!innerText) { return; }
+        const startIdx = innerText.indexOf("{{");
+        if (startIdx >= 0) {
+            const endIdx = innerText.indexOf("}}", startIdx);
+            if (endIdx > 0 && (endIdx - startIdx) < 20) {
+                const variableName = innerText.substring(startIdx + 2, endIdx).trim();
+                const textSuffix = innerText.substring(endIdx + 2);
+                const textPrefix = innerText.substring(0, startIdx);
+                registerVal(variableName, this, textPrefix, textSuffix);
+            }
+        }
+    });
+}
+
 function navigateTo(event) {
     event.preventDefault();
     const link = event.target;
@@ -7,20 +48,6 @@ function navigateTo(event) {
         loadComponents();
     }
 }
-
-var varw = (function (context) {
-    return function (varName, varValue) {
-        var value = varValue;
-
-        Object.defineProperty(context, varName, {
-            get: function () { return value; },
-            set: function (v) {
-                value = v;
-                console.log('Value changed! New value: ' + value);
-            }
-        });
-    };
-})(window);
 
 function onButton(event) {
     alert('root');
@@ -36,6 +63,7 @@ function loadComponents() {
         if (component.length > 0 && component !== url) {
             /*console.log("current [" + component + "] '" + current + "' url '" + url + "'");*/
             if (component !== current) {
+                outlet.dispatchEvent(onDestroyEvent);
                 downloadComponent(outlet, component);
             }
         } else {
@@ -51,9 +79,11 @@ function downloadComponent(component, path) {
     return fetch(myRequest)
         .then(response => response.text())
         .then(response => {
+            console.log('component ' + path);
             appendData(component, response);
             component.setAttribute("current", path);
             loadComponents();
+            component.dispatchEvent(onInitEvent);
         })
 }
 
@@ -65,6 +95,7 @@ function appendData(component, response) {
         scriptNode.innerHTML = script.innerHTML;
         component.appendChild(scriptNode);
     }
+    checkVariables(component);
 }
 
 function printComponents() {

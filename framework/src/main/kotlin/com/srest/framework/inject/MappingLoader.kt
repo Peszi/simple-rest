@@ -17,6 +17,6 @@ internal object MappingLoader {
     private fun getMappers(controller: Class<*>): List<MethodEntry> = controller.declaredMethods
             .filter { it.isAnnotationPresent(RequestMapping::class.java)}
             .map { val methodAnnotation = it.getAnnotation(RequestMapping::class.java)
-                MethodEntry.build(controller.simpleName, it, methodAnnotation)
+                MethodEntry.build(controller.name, it, methodAnnotation)
             }
 }

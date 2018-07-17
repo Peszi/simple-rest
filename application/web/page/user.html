@@ -1,8 +1,10 @@
 <div id="component" class="rounded border p-2">
-    <p class="mb-2 text-center">User component works!</p>
-    <div class="row" style="margin-left: -0.25rem; margin-right: -0.25rem">
+    <div class="rounded border" style="height: 400px;">
+        <p class="mb-2 text-center">User component works {{ timerValue }}!</p>
+    </div>
+    <div class="row mt-2" style="margin-left: -0.25rem; margin-right: -0.25rem">
         <div class="col-4 px-1">
-            <a class="btn btn-block btn-sm btn-primary" href="/user/john" onclick="navigateTo(event)">john {{ varWatch }}</a>
+            <a class="btn btn-block btn-sm btn-primary" href="/user/john" onclick="navigateTo(event)">{{ someData }}</a>
         </div>
         <div class="col-4 px-1">
             <a class="btn btn-block btn-sm btn-primary" href="/user/bob" onclick="navigateTo(event)">bob</a>
@@ -11,25 +13,53 @@
             <a class="btn btn-block btn-sm btn-primary" href="/user/dick" onclick="navigateTo(event)">dick</a>
         </div>
     </div>
-    <div class="mt-2">
-        <button class="btn btn-block btn-sm btn-primary" href="/user/john" onclick="onButton(event)">alert</button>
+    <div class="row mt-2" style="margin-left: -0.25rem; margin-right: -0.25rem">
+        <div class="col-6 px-1">
+            <button class="btn btn-block btn-sm btn-success" onclick="onButton(1)">plus</button>
+        </div>
+        <div class="col-6 px-1">
+            <button class="btn btn-block btn-sm btn-danger" onclick="onButton(-1)">minus</button>
+        </div>
     </div>
     <outlet class="mt-2" url="user/" current=""></outlet>
     <script>
 
-        let component = document.getElementById("component");
+        /* var somedata = 1; */
+        defineVal('someData', 0);
+        defineVal('timerValue', 0);
 
-        const varIndex = component.innerHTML.search("{{(.*)}}");
-        console.log('var index ' + varIndex);
-
-        varw('varWatch', 0);
-        console.log('value '  + varWatch);
-
-        function onButton(event) {
-
-
-            varWatch = 456;
-            console.log(varWatch);
+        function onButton(value) {
+            someData += value;
         }
+
+        const interval = setInterval(function () {
+            timerValue++;
+        }, 1000);
+        clearInterval(interval);
+
+
+        $('outlet').each(function () {
+            if ($(this).attr("url").length === 0) {
+                this.addEventListener('onInit', function () {
+                    console.log("user INIT!");
+                }, false);
+                this.addEventListener('onDestroy', function () {
+                    console.log("user DESTROYED!");
+                }, false);
+            }
+        });
+
+        /*
+        document.getElementById("myelement").addEventListener("click", handler);
+
+        function handler(e) {
+            // remove this handler
+            e.target.removeEventListener(e.type, arguments.callee);
+
+            alert("You'll only see this once!");
+        }
+           */
+
+
     </script>
 </div>

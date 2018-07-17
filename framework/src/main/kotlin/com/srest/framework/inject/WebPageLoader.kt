@@ -15,8 +15,8 @@ internal object WebPageLoader {
 
     private val PAGE_FILES_EXTENSIONS = listOf("js", "css", "map")
 
-    private val PAGE_SERVICE_BEAN = InternalPageService::class.simpleName ?: throw RuntimeException("Cannot resolve InternalPageService bean!")
-    private val PAGE_FILES_SERVICE_BEAN = InternalPageFilesService::class.simpleName ?: throw RuntimeException("Cannot resolve InternalPageFilesService bean!")
+    private val PAGE_SERVICE_BEAN = InternalPageService::class.qualifiedName ?: throw RuntimeException("Cannot resolve InternalPageService bean!")
+    private val PAGE_FILES_SERVICE_BEAN = InternalPageFilesService::class.qualifiedName ?: throw RuntimeException("Cannot resolve InternalPageFilesService bean!")
 
     private val GET_PAGE_METHOD = MethodManager.getMethodByName(InternalPageService::class.java, "getPageContent") ?: throw RuntimeException("InternalPageService METHOD not found!")
     private val GET_COMPONENT_METHOD = MethodManager.getMethodByName(InternalPageService::class.java, "getComponentContent") ?: throw RuntimeException("InternalPageService METHOD not found!")
@@ -27,11 +27,10 @@ internal object WebPageLoader {
         val webControllers = annotatedClasses.filter { WebController::class in it.annotations }
         webControllers.forEach {
             val webController = it.classObject.getAnnotation(WebController::class.java)
-            // PAGE
-            val pageServiceBean: InternalPageService = InternalPageService::class.safeCast(beansBuffer[InternalPageService::class.simpleName])
+            // create PAGE
+            val pageServiceBean: InternalPageService = InternalPageService::class.safeCast(beansBuffer[PAGE_SERVICE_BEAN])
                     ?: throw RuntimeException("InternalPageService BEAN not exists!")
             pageServiceBean.addWebPage(webController)
-            // MAPPINGS
             // map page/index
             beansMappers.add(MethodEntry.buildPageEntry(PAGE_SERVICE_BEAN, GET_PAGE_METHOD, webController.url))
             // map page/components

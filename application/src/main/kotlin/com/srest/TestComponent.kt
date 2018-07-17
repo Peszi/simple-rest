@@ -1,23 +1,29 @@
 package com.srest
 
-import com.srest.framework.annotation.Component
+import com.srest.framework.annotation.Autowire
+import com.srest.framework.request.HttpMethod
+import com.srest.framework.util.Controller
+import com.srest.framework.util.RequestMapping
 
-@Component
-internal class TestComponent(
-        val testComponentB: TestComponentB
+@Controller
+internal class TestControllerA(
+        var controller: TestControllerB
 ) {
 
-    fun printTest() {
-        println("Test OK!")
-    }
+    fun getName() = "\"${this::class.simpleName}\""
 
+    @RequestMapping(HttpMethod.GET, "/a")
+    fun getTest() = "= ${controller.getName()}"
 }
 
-@Component
-internal class TestComponentB {
+@Controller
+internal class TestControllerB{
 
-    fun printTest2() {
-        println("Test OK!")
-    }
+    @Autowire
+    lateinit var autoController: TestControllerA
 
+    fun getName() = "\"${this::class.simpleName}\""
+
+    @RequestMapping(HttpMethod.GET, "/b")
+    fun getTest() = "= ${autoController.getName()}"
 }

@@ -6,7 +6,7 @@ internal object ResponseConstants {
 
 }
 
-internal object ContentType {
+object ContentType {
 
     const val JSON_TYPE = "application/json" // application/json;charset=UTF-8
     const val CSS_TYPE = "text/css"

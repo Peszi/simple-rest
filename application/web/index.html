@@ -6,6 +6,8 @@
         <link rel="icon" href="data:;base64,iVBORw0KGgo=">
         <link href="/web/style.css" rel="stylesheet"/>
         <link href="/web/static/bootstrap.css" rel="stylesheet"/>
+        <!--<script src="/web/static/jquery-3.3.1.min.js"/>-->
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     </head>
     <body>
         <div class="container my-4">
@@ -14,13 +16,13 @@
                     <div class="card px-2">
                         <div class="row py-2" style="margin-left: -0.25rem; margin-right: -0.25rem">
                             <div class="col-4 px-1">
-                                <a class="btn btn-block btn-sm btn-primary" href="/" onclick="navigateTo(event)">home</a>
+                                <a class="btn btn-block btn-sm btn-primary" href="/" onclick="navigateTo(onInitEvent)">home</a>
                             </div>
                             <div class="col-4 px-1 ">
-                                <a class="btn btn-block btn-sm btn-primary" href="/user" onclick="navigateTo(event)">user</a>
+                                <a class="btn btn-block btn-sm btn-primary" href="/user" onclick="navigateTo(onInitEvent)">user</a>
                             </div>
                             <div class="col-4 px-1">
-                                <a class="btn btn-block btn-sm btn-primary" href="/spring" onclick="navigateTo(event)">spring</a>
+                                <a class="btn btn-block btn-sm btn-primary" href="/spring" onclick="navigateTo(onInitEvent)">spring</a>
                             </div>
                         </div>
                         <div class="mb-2">
