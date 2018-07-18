@@ -1,6 +1,7 @@
 package com.srest.framework.response
 
 import com.srest.framework.response.ResponseConstants.SERVER_NAME
+import java.io.BufferedOutputStream
 import java.io.BufferedWriter
 
 class Response(
@@ -19,11 +20,11 @@ class Response(
                 "Content-Length: ${response.contentData.length}"
         )
 
-        fun writeResponse(outputBuffer: BufferedWriter, response: Response) {
-            for (header in getHeaders(response))
-                outputBuffer.write("$header\r\n")
-            outputBuffer.write("\r\n")
-            outputBuffer.write(response.contentData)
+        fun writeResponse(outputBuffer: BufferedOutputStream, response: Response) {
+//            for (header in getHeaders(response))
+//                outputBuffer.write("$header\r\n")
+//            outputBuffer.write("\r\n")
+//            outputBuffer.write(response.contentData)
         }
     }
 }

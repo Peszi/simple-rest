@@ -3,6 +3,7 @@ package com.srest.controller
 import com.srest.framework.annotation.Component
 import com.srest.framework.request.HttpMethod
 import com.srest.framework.response.ContentType
+import com.srest.framework.response.ResponseParams
 import com.srest.framework.util.Controller
 import com.srest.framework.util.RequestMapping
 
@@ -11,9 +12,14 @@ internal class TestControllerA(
         private val simpleComponent: ParentComponent
 ) {
 
-    @RequestMapping(HttpMethod.GET, "/aa", ContentType.JSON_TYPE)
+    @RequestMapping(HttpMethod.GET, "/files")
     fun getTest(): String {
-        return "{ \"${this::class.simpleName}\" : ${simpleComponent.getIndexValue()}}"
+        return "<a href=\"/files/file.txt\">file.txt</a>"
+    }
+
+    @RequestMapping(HttpMethod.GET, "/files/file.txt", ContentType.OCTET_STREAM_TYPE)
+    fun getFile(responseParams: ResponseParams): String {
+        return "some file data"
     }
 }
 

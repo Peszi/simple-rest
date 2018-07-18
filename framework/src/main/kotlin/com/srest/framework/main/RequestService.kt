@@ -26,8 +26,8 @@ internal class RequestService(
 
     private fun processRequest(client: Socket) {
         try {
-            val inputBuffer = BufferedReader(InputStreamReader(client.getInputStream()))
-            val outputBuffer = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
+            val inputBuffer = BufferedInputStream(client.getInputStream())
+            val outputBuffer = BufferedOutputStream(client.getOutputStream())
             val request = getRequest(inputBuffer)
             Response.writeResponse(outputBuffer, prepareResponse(request))
             outputBuffer.close()
@@ -37,7 +37,7 @@ internal class RequestService(
         }
     }
 
-    private fun getRequest(inputBuffer: BufferedReader): Request? {
+    private fun getRequest(inputBuffer: BufferedInputStream): Request? {
 //        val charBuffer = mutableListOf<Char>()
 //        while (true) {
 //            val char = inputBuffer.read(); if (char < 0) break
@@ -46,13 +46,28 @@ internal class RequestService(
 //                print(String(charBuffer.toCharArray())); charBuffer.clear()
 //            }
 //        }
-        var line = inputBuffer.readLine() ?: return null
-        val request = Request.build(line)
+
+        val buffer = ByteArray(8192)
         while (true) {
-            line = inputBuffer.readLine()
-            if (line == null || line.isEmpty()) break
-            request.appendHeader(line)
+            val limit = inputBuffer.read(buffer)
+            if (limit <= 0) break
+//            fw.write(buffer, 0, count)
+            var buffer = buffer.copyOfRange(0, limit)
+            while (true) {
+                val endIdx = buffer.indexOf(10)
+                if (endIdx <= 0) break
+                val line = String(buffer, 0, endIdx)
+                buffer = buffer.copyOfRange(endIdx + 1, buffer.size)
+            }
         }
+
+//        var line = inputBuffer.readLine() ?: return null
+        val request = Request.build("")
+//        while (true) {
+//            line = inputBuffer.readLine()
+//            if (line == null || line.isEmpty()) break
+//            request.appendHeader(line)
+//        }
         return request
     }
 

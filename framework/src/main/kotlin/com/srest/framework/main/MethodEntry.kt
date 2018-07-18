@@ -16,7 +16,7 @@ class MethodEntry(
 ) {
 
     fun toResponseParams() = ResponseParams(
-            requestMethod, requestContentType
+            requestContentType
     )
 
     companion object {

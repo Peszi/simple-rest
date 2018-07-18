@@ -2,19 +2,19 @@
 var onInitEvent = new Event('onInit');
 var onDestroyEvent = new Event('onDestroy');
 
-function defineVal(name, value) {
-    Object.defineProperty(window, name, {
+function defineVal(context, name, value) {
+    Object.defineProperty(context, name, {
         configurable: true,
         value: value
     });
 }
 
-function registerVal(varName, varComponent, prefix, suffix) {
+function registerVal(context, varName, varComponent, prefix, suffix) {
     console.log("Setting up VAR " + varName);
-    let value = window[varName];
+    let value = context[varName];
     let component = varComponent;
     component.innerText = prefix + value + suffix;
-    Object.defineProperty(window, varName, {
+    Object.defineProperty(context, varName, {
         get: function () { return value; },
         set: function (v) { value = v;
             component.innerText = prefix + value + suffix;

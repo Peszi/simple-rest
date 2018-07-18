@@ -12,6 +12,7 @@ object ContentType {
     const val CSS_TYPE = "text/css"
     const val JS_TYPE = "application/javascript"
     const val HTML_TYPE = "text/html"
+    const val OCTET_STREAM_TYPE = "application/octet-stream"
 
     fun getTypeForExtension(extension: String) = when(extension) {
         "html"  -> HTML_TYPE

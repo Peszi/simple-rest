@@ -15,27 +15,40 @@
     </div>
     <div class="row mt-2" style="margin-left: -0.25rem; margin-right: -0.25rem">
         <div class="col-6 px-1">
-            <button class="btn btn-block btn-sm btn-success" onclick="onButton(1)">plus</button>
+            <button class="btn btn-block btn-sm btn-success" onclick="user.onButton(1)">plus</button>
         </div>
         <div class="col-6 px-1">
-            <button class="btn btn-block btn-sm btn-danger" onclick="onButton(-1)">minus</button>
+            <button class="btn btn-block btn-sm btn-danger" onclick="user.onButton(-1)">minus</button>
         </div>
     </div>
     <outlet class="mt-2" url="user/" current=""></outlet>
     <script>
 
-        /* var somedata = 1; */
-        defineVal('someData', 0);
-        defineVal('timerValue', 0);
+        class User {
 
-        function onButton(value) {
-            someData += value;
+            someData = 0;
+
+            /*
+            constructor() {
+                defineVal(this, 'someData', 0);
+                defineVal('timerValue', 0);
+            }
+            var somedata = 1; */
+
+
+            onButton(value) {
+                someData += value;
+                console.log(someData);
+            }
+
+            /*
+            const interval = setInterval(function () {
+                timerValue++;
+            }, 1000);
+            clearInterval(interval);*/
         }
+        var user = new User();
 
-        const interval = setInterval(function () {
-            timerValue++;
-        }, 1000);
-        clearInterval(interval);
 
 
         $('outlet').each(function () {
