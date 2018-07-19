@@ -36,16 +36,16 @@ internal class FrameworkService(
 
     // Get response
     override fun onResponse(request: Request): Response {
-        Logger.log.info("got request [${request.method}] '${request.endpoint}'")
+        Logger.log.info("got request [${request.method}] '${request.endpoint}' ${request.params}")
         // Controllers
         beansMappers
                 .firstOrNull { it.requestEndpoint == request.endpoint && it.requestMethod == request.method }
-                ?.run { val methodEntry = this
-                    beansBuffer[this.bean]
-                            ?.let { return ClassInjector.invokeMethod(it, methodEntry, request) }
-                            ?: Logger.log.warn("cannot get ${this.bean} bean!")
+                ?.let { val methodEntry = it
+                    beansBuffer[it.bean]?.let {
+                        ClassInjector.invokeMethod(it, methodEntry, request)?.let { return it }
+                    } ?: Logger.log.warn("issue with ${methodEntry.bean} bean!")
                 }
         Logger.log.warn("cannot find response!")
-        return Response(ContentType.HTML_TYPE, PageData.PAGE_NOT_FOUND)
+        return Response.build(ContentType.HTML_TYPE, PageData.PAGE_NOT_FOUND)
     }
 }

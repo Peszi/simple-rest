@@ -2,7 +2,7 @@ package com.srest.framework.main
 
 import com.srest.framework.request.HttpMethod
 import com.srest.framework.response.ContentType
-import com.srest.framework.response.ResponseParams
+import com.srest.framework.response.Response
 import com.srest.framework.util.RequestMapping
 import java.lang.reflect.Method
 
@@ -15,7 +15,7 @@ class MethodEntry(
         val requestContentType: String
 ) {
 
-    fun toResponseParams() = ResponseParams(
+    fun toResponse() = Response(
             requestContentType
     )
 

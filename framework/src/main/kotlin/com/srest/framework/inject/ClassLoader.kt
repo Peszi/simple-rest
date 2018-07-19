@@ -2,10 +2,6 @@ package com.srest.framework.inject
 
 import com.srest.framework.annotation.Component
 import com.srest.framework.annotation.web.WebController
-import com.srest.framework.main.MethodEntry
-import com.srest.framework.request.Request
-import com.srest.framework.response.Response
-import com.srest.framework.response.ResponseParams
 import com.srest.framework.util.Controller
 import java.io.File
 import kotlin.reflect.KClass

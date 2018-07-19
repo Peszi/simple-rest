@@ -3,7 +3,7 @@ package com.srest.framework.bean
 import com.srest.framework.annotation.Component
 import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
-import com.srest.framework.response.ResponseParams
+import com.srest.framework.response.Response
 import com.srest.framework.util.Constants
 import com.srest.framework.util.FileReader
 
@@ -13,8 +13,8 @@ internal class InternalPageFilesService {
     private var frameworkData: String = ""
     private var filesBuffer: MutableMap<String, String> = mutableMapOf()
 
-    fun getPageFileData(request: Request, responseParams: ResponseParams): String {
-        responseParams.contentType = ContentType.getTypeForExtension(request.endpoint.split(".")[1])
+    fun getPageFileData(request: Request, response: Response): String {
+        response.contentType = ContentType.getTypeForExtension(request.endpoint.split(".")[1])
         val storeFile: Boolean = request.endpoint.contains("/static/") || !Constants.LIVE_RELOAD
         if (storeFile && filesBuffer.containsKey(request.endpoint)) return filesBuffer[request.endpoint]!!
         val fileData = FileReader.loadFileText(request.endpoint) ?: "Cannot load file!"

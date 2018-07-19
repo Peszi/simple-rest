@@ -2,18 +2,14 @@ package com.srest.framework.inject
 
 import com.srest.framework.annotation.Autowire
 import com.srest.framework.annotation.Component
+import com.srest.framework.annotation.RequestParam
 import com.srest.framework.main.MethodEntry
 import com.srest.framework.request.Request
 import com.srest.framework.response.Response
-import com.srest.framework.response.ResponseParams
-import com.srest.framework.util.Logger
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.javaType
-import kotlin.reflect.jvm.reflect
 
 internal object ClassInjector {
 
@@ -60,18 +56,31 @@ internal object ClassInjector {
     }
 
     @JvmStatic
-    fun invokeMethod(bean: Any, handler: MethodEntry, request: Request): Response {
-        val responseParams = handler.toResponseParams()
+    fun invokeMethod(bean: Any, handler: MethodEntry, request: Request): Response? {
+        val response = handler.toResponse()
         val arguments = mutableListOf<Any>()
-        handler.method.parameters.filter { it.type == Request::class.java }.forEach { arguments.add(request) }
-        handler.method.parameters.filter { it.type == ResponseParams::class.java }.forEach { arguments.add(responseParams) }
+        handler.method.parameters.forEach {
+            when {
+                it.type == Request::class.java -> arguments.add(request)
+                it.type == Response::class.java -> arguments.add(response)
+                it.isAnnotationPresent(RequestParam::class.java) -> {
+                    val annotation = it.getAnnotation(RequestParam::class.java)
+                    val paramName = if (annotation.name.isNotEmpty()) annotation.name else it.name
+                    val paramValue = request.params[paramName]
+                    if (paramValue != null) { arguments.add(paramValue) } else {
+                        if (annotation.required) throw RuntimeException("Parameter needed '$paramName'")
+                        arguments.add("")
+                    }
+                }
+            }
+        }
         try {
             val result = handler.method.invoke(bean, *arguments.toTypedArray())
-            if (result is String) return Response(responseParams.contentType, result)
+            if (result is String) response.contentData = result.toByteArray(Charsets.UTF_8)
+            return response
         } catch (e: InvocationTargetException) {
             e.printStackTrace()
         }
-        // map object to Json
-        return Response(handler.requestContentType, "{ \"error\": \"json not supported\" }")
+        return null
     }
 }
