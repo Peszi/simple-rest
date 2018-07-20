@@ -1,17 +1,19 @@
 package com.srest.framework.main
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.srest.framework.bean.InternalPageFilesService
 import com.srest.framework.bean.InternalPageService
 import com.srest.framework.inject.ClassInjector
 import com.srest.framework.inject.ClassLoader
 import com.srest.framework.inject.MappingLoader
 import com.srest.framework.inject.WebPageLoader
-import com.srest.framework.request.HttpMethod
 import com.srest.framework.request.Request
 import com.srest.framework.response.ContentType
+import com.srest.framework.response.ContentType.TEXT_HTML
+import com.srest.framework.response.ErrorResponse
 import com.srest.framework.response.Response
 import com.srest.framework.util.*
-import sun.rmi.runtime.Log
 import kotlin.reflect.KClass
 
 internal class FrameworkService(
@@ -20,6 +22,7 @@ internal class FrameworkService(
 
     private val beansBuffer: MutableMap<String, Any> = mutableMapOf()
     private val beansMappers: MutableList<MethodEntry> = mutableListOf()
+    private val jsonMapper = ObjectMapper().registerKotlinModule()
 
     init {
         val targetClasses = ClassLoader.scanForClasses(baseClass,
@@ -38,14 +41,28 @@ internal class FrameworkService(
     override fun onResponse(request: Request): Response {
         Logger.log.info("got request [${request.method}] '${request.endpoint}' ${request.params}")
         // Controllers
-        beansMappers
-                .firstOrNull { it.requestEndpoint == request.endpoint && it.requestMethod == request.method }
-                ?.let { val methodEntry = it
-                    beansBuffer[it.bean]?.let {
-                        ClassInjector.invokeMethod(it, methodEntry, request)?.let { return it }
-                    } ?: Logger.log.warn("issue with ${methodEntry.bean} bean!")
-                }
-        Logger.log.warn("cannot find response!")
-        return Response.build(ContentType.HTML_TYPE, PageData.PAGE_NOT_FOUND)
+        val mapper = getMapper(request)
+        mapper?.run {
+            getBean(beanName)?.let {
+                ClassInjector.invokeMethod(jsonMapper, it, mapper, request)?.let { return it }
+            } ?: Logger.log.warn("issue with $beanName beanName!")
+        }
+        Logger.log.warn("Cannot find response!")
+        return getErrorResponse(request)
     }
+
+    // Not Found Response
+    private fun getErrorResponse(request: Request): Response {
+        val errorResponse = ErrorResponse.buildNotFound(request.endpoint)
+        val isHtmlRequest = request.isAccepting(TEXT_HTML)
+        val errorType = if (isHtmlRequest) ContentType.TEXT_HTML else ContentType.APP_JSON
+        val errorData = if (isHtmlRequest) PageData.getErrorPage(errorResponse) else jsonMapper.writeValueAsString(errorResponse)
+        return Response.build(errorType, errorData, errorResponse.code)
+    }
+
+    private fun getMapper(request: Request) = beansMappers
+            .firstOrNull { it.requestEndpoint == request.endpoint && it.requestMethod == request.method }
+
+    private fun getBean(beanName: String) = beansBuffer[beanName]
+
 }

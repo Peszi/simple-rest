@@ -14,18 +14,3 @@ import com.srest.framework.annotation.web.WebController
 //            ]),
 //    ChildComponent("/spring","page/spring.html", SpringComponent::class)
 //])
-internal class IndexController {
-
-
-    @ComponentRequest(UserComponent::class) // that is not requestMapping!!! INTERNAL ONLY
-    fun getUser(): Map<String, Int> {
-
-        return mapOf("data" to 59)
-    }
-}
-
-internal class UserComponent
-
-internal class SpringComponent
-
-internal class JohnComponent

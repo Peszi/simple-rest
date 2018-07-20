@@ -7,6 +7,8 @@ class Request(
         val headers: Map<String, String>
 ) {
 
+    fun isAccepting(contentType: String) = headers["Accept"]?.run { return contains(contentType, true) } ?: false
+
     companion object {
 
         fun build(requestHeaders: List<String>): Request {

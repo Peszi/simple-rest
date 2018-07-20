@@ -8,17 +8,17 @@ internal object ResponseConstants {
 
 object ContentType {
 
-    const val JSON_TYPE = "application/json" // application/json;charset=UTF-8
-    const val CSS_TYPE = "text/css"
-    const val JS_TYPE = "application/javascript"
-    const val HTML_TYPE = "text/html"
-    const val OCTET_STREAM_TYPE = "application/octet-stream"
+    const val APP_JSON = "application/json" // application/json;charset=UTF-8
+    const val APP_OCTET_STREAM_TYPE = "application/octet-stream"
+    const val APP_JS = "application/javascript"
+    const val TEXT_HTML = "text/html"
+    const val TEXT_CSS = "text/css"
 
     fun getTypeForExtension(extension: String) = when(extension) {
-        "html"  -> HTML_TYPE
-        "js"    -> JS_TYPE
-        "css"   -> CSS_TYPE
-        "json"  -> JSON_TYPE
-        else    -> HTML_TYPE
+        "html"  -> TEXT_HTML
+        "css"   -> TEXT_CSS
+        "js"    -> APP_JS
+        "json"  -> APP_JSON
+        else    -> TEXT_HTML
     }
 }

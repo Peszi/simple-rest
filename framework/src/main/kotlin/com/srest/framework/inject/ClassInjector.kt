@@ -1,12 +1,16 @@
 package com.srest.framework.inject
 
-import com.srest.framework.annotation.Autowire
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.srest.framework.annotation.util.Autowire
 import com.srest.framework.annotation.Component
-import com.srest.framework.annotation.RequestParam
+import com.srest.framework.annotation.util.RequestParam
 import com.srest.framework.main.MethodEntry
 import com.srest.framework.request.Request
+import com.srest.framework.response.ContentType
 import com.srest.framework.response.Response
+import com.srest.framework.response.ResponseEntity
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Parameter
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
@@ -56,10 +60,36 @@ internal object ClassInjector {
     }
 
     @JvmStatic
-    fun invokeMethod(bean: Any, handler: MethodEntry, request: Request): Response? {
-        val response = handler.toResponse()
+    fun invokeMethod(jsonMapper: ObjectMapper, bean: Any, mapper: MethodEntry, request: Request): Response? {
+        val response = mapper.toResponse()
+        val arguments = getArguments(mapper.beanMethod.parameters, request, response)
+        try {
+            val result = mapper.beanMethod.invoke(bean, *arguments.toTypedArray())
+            var contentData: Any?
+            if (result is ResponseEntity<*>) {
+                contentData = result.responseData
+                response.responseCode = result.responseCode
+            } else {
+                contentData = result
+                response.responseCode = 200
+            }
+            if (contentData is String) { response.setData(contentData) }
+            if (mapper.responseBody) {
+                response.setType(ContentType.APP_JSON)
+                if (contentData !is String) response.setData(jsonMapper.writeValueAsString(contentData))
+            } else if (contentData !is String && response.contentType == ContentType.TEXT_HTML) {
+                throw RuntimeException("Html response available with String response!")
+            }
+            return response
+        } catch (e: InvocationTargetException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    private fun getArguments(parameters: Array<Parameter>, request: Request, response: Response): List<Any> {
         val arguments = mutableListOf<Any>()
-        handler.method.parameters.forEach {
+        parameters.forEach {
             when {
                 it.type == Request::class.java -> arguments.add(request)
                 it.type == Response::class.java -> arguments.add(response)
@@ -74,13 +104,6 @@ internal object ClassInjector {
                 }
             }
         }
-        try {
-            val result = handler.method.invoke(bean, *arguments.toTypedArray())
-            if (result is String) response.contentData = result.toByteArray(Charsets.UTF_8)
-            return response
-        } catch (e: InvocationTargetException) {
-            e.printStackTrace()
-        }
-        return null
+        return arguments
     }
 }

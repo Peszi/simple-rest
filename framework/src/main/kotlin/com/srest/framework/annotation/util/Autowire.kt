@@ -1,4 +1,4 @@
-package com.srest.framework.annotation
+package com.srest.framework.annotation.util
 
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)

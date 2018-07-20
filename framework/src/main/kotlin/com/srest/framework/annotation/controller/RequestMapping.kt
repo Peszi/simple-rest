@@ -8,5 +8,5 @@ import com.srest.framework.response.ContentType
 annotation class RequestMapping(
         val method: HttpMethod,
         val mapping: String = "",
-        val contentType: String = ContentType.HTML_TYPE
+        val contentType: String = ContentType.TEXT_HTML
 )

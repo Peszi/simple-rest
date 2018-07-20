@@ -1,4 +1,13 @@
 package com.srest.framework.response
 
-internal class ResponseEntity(
-)
+class ResponseEntity<T>(
+        val responseData: T,
+        val responseCode: Int
+
+) {
+    companion object {
+        fun <T> ok(responseData: T) = ResponseEntity(
+                responseData, 200
+        )
+    }
+}

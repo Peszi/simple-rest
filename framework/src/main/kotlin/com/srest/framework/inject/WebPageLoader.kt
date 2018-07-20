@@ -15,8 +15,8 @@ internal object WebPageLoader {
 
     private val PAGE_FILES_EXTENSIONS = listOf("js", "css", "map")
 
-    private val PAGE_SERVICE_BEAN = InternalPageService::class.qualifiedName ?: throw RuntimeException("Cannot resolve InternalPageService bean!")
-    private val PAGE_FILES_SERVICE_BEAN = InternalPageFilesService::class.qualifiedName ?: throw RuntimeException("Cannot resolve InternalPageFilesService bean!")
+    private val PAGE_SERVICE_BEAN = InternalPageService::class.qualifiedName ?: throw RuntimeException("Cannot resolve InternalPageService beanName!")
+    private val PAGE_FILES_SERVICE_BEAN = InternalPageFilesService::class.qualifiedName ?: throw RuntimeException("Cannot resolve InternalPageFilesService beanName!")
 
     private val GET_PAGE_METHOD = MethodManager.getMethodByName(InternalPageService::class.java, "getPageContent") ?: throw RuntimeException("InternalPageService METHOD not found!")
     private val GET_COMPONENT_METHOD = MethodManager.getMethodByName(InternalPageService::class.java, "getComponentContent") ?: throw RuntimeException("InternalPageService METHOD not found!")
@@ -45,7 +45,7 @@ internal object WebPageLoader {
         }
         // map framework
         if (webControllers.isNotEmpty())
-            beansMappers.add(MethodEntry(PAGE_FILES_SERVICE_BEAN, GET_FRAMEWORK_METHOD, "/framework.js", HttpMethod.GET, ContentType.JS_TYPE))
+            beansMappers.add(MethodEntry(PAGE_FILES_SERVICE_BEAN, GET_FRAMEWORK_METHOD, "/framework.js", HttpMethod.GET, ContentType.APP_JS))
     }
 
     private fun loadPageFiles(beansMappers: MutableList<MethodEntry>, path: String) {
