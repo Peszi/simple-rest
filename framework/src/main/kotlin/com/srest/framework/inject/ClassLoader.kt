@@ -1,9 +1,11 @@
 package com.srest.framework.inject
 
+import com.fasterxml.jackson.module.kotlin.isKotlinClass
 import com.srest.framework.annotation.Component
 import com.srest.framework.annotation.RestController
 import com.srest.framework.annotation.web.WebController
 import com.srest.framework.util.Controller
+import com.srest.framework.util.Logger
 import java.io.File
 import kotlin.reflect.KClass
 import java.util.zip.ZipEntry
@@ -30,40 +32,44 @@ internal object ClassLoader {
             if (annotations.isNotEmpty()) annotatedClasses.add(AnnotatedClass(objectClass, annotations))
         }
         // load package beans
+        fun addAnnotatedClass(annotatedClass: Class<*>) {
+            if (!annotatedClass.isAnnotation && annotatedClass.annotations.isNotEmpty()) {
+                val annotations = ClassLoader.getAnnotations(annotatedClass, REQUIRED_ANNOTATIONS)
+                if (annotations.isNotEmpty()) {
+                    Logger.log.info("CLASS ${annotatedClass.canonicalName}")
+                    annotatedClasses.add(AnnotatedClass(annotatedClass, annotations))
+                }
+            }
+        }
+        Logger.log.info("Trying to load classes from Jar..")
+        loadClassesFromJar(baseClass) { addAnnotatedClass(this) }
+        Logger.log.info("Trying to load classes from resources..")
+        loadClassesFromResources(baseClass) { addAnnotatedClass(this) }
+        return annotatedClasses
+    }
+
+    private fun loadClassesFromResources(baseClass: KClass<out Any>, block: Class<*>.() -> Unit) {
         val packageName = baseClass.qualifiedName!!.substringBeforeLast(".")
         val path = baseClass.java.classLoader.getResource(packageName.replace(".", "/")).path
-        println("PATH '$path'")
-        println("PACK '$packageName'")
-
-        val classNames = ArrayList<String>()
-
-
-
-        println(" " + baseClass.java.classLoader.getResource("").path)
-//        baseClass.java.classLoader.
-//        println("CLASS " + baseClass.java.classLoader.loadClass("com.srest.controller.FilesController").simpleName)
         fun scanForAnnotatedFiles(currentPath: String, classPackage: String) {
             File(currentPath).listFiles().forEach {
                 if (it.isDirectory) { scanForAnnotatedFiles(it.path, classPackage + "." + it.name)
                 } else {
                     try {
-                        val objectClass = Class.forName("$classPackage.${it.name.substringBeforeLast(".")}")
-                        if (objectClass.annotations.isNotEmpty()) {
-                            val annotations = ClassLoader.getAnnotations(objectClass, REQUIRED_ANNOTATIONS)
-                            if (annotations.isNotEmpty()) annotatedClasses.add(AnnotatedClass(objectClass, annotations))
-                        }
+                        Class.forName("$classPackage.${it.name.substringBeforeLast(".")}").block()
                     } catch (e: ClassNotFoundException) {
-                        println("Class rejected!")
+                        println("Cannot load class $classPackage")
                     }
                 }
             }
         }
-        scanForAnnotatedFiles(path, packageName)
-        return annotatedClasses
+        try {
+            scanForAnnotatedFiles(path, packageName)
+        } catch (e: IllegalStateException) {}
     }
 
-    fun loadClasses(baseClass: KClass<out Any>, packageName: String) {
-        println("BASE_PACKAGE $packageName")
+    private fun loadClassesFromJar(baseClass: KClass<out Any>, block: Class<*>.() -> Unit) {
+        val packageName = baseClass.qualifiedName!!.substringBeforeLast(".")
         val packagePath = packageName.replace(".","/")
         try {
             val zip = ZipInputStream(this::class.java.protectionDomain.codeSource.location.openStream())
@@ -72,11 +78,9 @@ internal object ClassLoader {
                 if (entry.isDirectory || !entry.name.startsWith(packagePath)) continue
                 val className = entry.name.replace('/', '.').substringBefore(".class")
                 try {
-                    val classObject = baseClass.java.classLoader.loadClass(className)
-                    println("CLASS " + classObject.simpleName)
-                    classObject.declaredMethods.forEach { println("m " + it.returnType.simpleName) }
+                    baseClass.java.classLoader.loadClass(className).block()
                 } catch (e: ClassNotFoundException) {
-                    println("Cannot load class $className")
+                    println("Cannot load class ${entry.name}")
                 }
             }
         } catch (e: FileNotFoundException) {

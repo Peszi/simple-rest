@@ -17,7 +17,7 @@ internal class FilesController {
     @RequestMapping(HttpMethod.GET, "/")
     fun getFilesList(): String {
         var filesList = ""
-        File(BASE_DIR).listFiles()
+        File(this::class.java.protectionDomain.codeSource.location.path).parentFile.listFiles()
                 .forEach { filesList += "<li><a href=\"/file?name=${it.name}\" >${it.name}</a></li>" }
         return if (filesList.isNotEmpty()) "<ul>$filesList</ul>" else "<p>no files in '$BASE_DIR'</p>"
     }

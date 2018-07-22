@@ -81,7 +81,7 @@ internal object ClassInjector {
                 throw RuntimeException("Html response available with String response!")
             }
             return response
-        } catch (e: InvocationTargetException) {
+        } catch (e: RuntimeException) {
             e.printStackTrace()
         }
         return null
