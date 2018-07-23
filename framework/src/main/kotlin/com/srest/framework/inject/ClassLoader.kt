@@ -35,35 +35,30 @@ internal object ClassLoader {
         fun addAnnotatedClass(annotatedClass: Class<*>) {
             if (!annotatedClass.isAnnotation && annotatedClass.annotations.isNotEmpty()) {
                 val annotations = ClassLoader.getAnnotations(annotatedClass, REQUIRED_ANNOTATIONS)
-                if (annotations.isNotEmpty()) {
-                    Logger.log.info("CLASS ${annotatedClass.canonicalName}")
-                    annotatedClasses.add(AnnotatedClass(annotatedClass, annotations))
-                }
+                if (annotations.isNotEmpty()) annotatedClasses.add(AnnotatedClass(annotatedClass, annotations))
             }
         }
-        Logger.log.info("Trying to load classes from Jar..")
         loadClassesFromJar(baseClass) { addAnnotatedClass(this) }
-        Logger.log.info("Trying to load classes from resources..")
         loadClassesFromResources(baseClass) { addAnnotatedClass(this) }
         return annotatedClasses
     }
 
     private fun loadClassesFromResources(baseClass: KClass<out Any>, block: Class<*>.() -> Unit) {
         val packageName = baseClass.qualifiedName!!.substringBeforeLast(".")
-        val path = baseClass.java.classLoader.getResource(packageName.replace(".", "/")).path
-        fun scanForAnnotatedFiles(currentPath: String, classPackage: String) {
-            File(currentPath).listFiles().forEach {
-                if (it.isDirectory) { scanForAnnotatedFiles(it.path, classPackage + "." + it.name)
-                } else {
-                    try {
-                        Class.forName("$classPackage.${it.name.substringBeforeLast(".")}").block()
-                    } catch (e: ClassNotFoundException) {
-                        println("Cannot load class $classPackage")
+        try {
+            val path = baseClass.java.classLoader.getResource(packageName.replace(".", "/")).path
+            fun scanForAnnotatedFiles(currentPath: String, classPackage: String) {
+                File(currentPath).listFiles().forEach {
+                    if (it.isDirectory) { scanForAnnotatedFiles(it.path, classPackage + "." + it.name)
+                    } else {
+                        try {
+                            Class.forName("$classPackage.${it.name.substringBeforeLast(".")}").block()
+                        } catch (e: ClassNotFoundException) {
+                            println("Cannot load class $classPackage")
+                        }
                     }
                 }
             }
-        }
-        try {
             scanForAnnotatedFiles(path, packageName)
         } catch (e: IllegalStateException) {}
     }

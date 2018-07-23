@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .m-0 {
+            margin: 0;
+        }
+        .container {
+            margin-left: -0.0rem;
+            padding: 0.25rem;
+            display: flex;
+            flex-flow: row;
+        }
+        .border {
+            border: 1px solid lightgrey;
+            border-radius: 0.25rem;
+        }
+        .file {
+            margin: 0.25rem;
+            padding: 0.5rem;
+            border: 1px solid lightgrey;
+            border-radius: 0.25rem;
+            display: flex;
+            flex-flow: column;
+            flex-basis: content;
+            justify-content: center;
+            box-shadow: 2px 2px #888888;
+        }
+        .file:hover {
+            box-shadow: 3px 3px #888888;
+            cursor: pointer;
+        }
+        .image {
+            text-align: center;
+            margin-bottom: 0.2rem;
+        }
+        .title {
+            margin: 0;
+            padding: 0.1rem 0.25rem;
+            color: white;
+            font-size: 0.8rem;
+            background-color: #1d2124;
+            border-radius: 1rem;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-align: center;
+            width: 60px;
+            height: 0.9rem;
+        }
+        a:visited {
+            color: #1d2124;
+        }
+    </style>
+</head>
+<body style="margin: 1rem">
+    <div class="container">
+        <a href="/"><div class="file">
+            <h1 class="m-0 image"><i class="fa fa-file-o" aria-hidden="true"></i></h1>
+            <p class="title">some long title of file.txt</p>
+        </div></a>
+        <div class="file">
+            <h1 class="m-0 image"><i class="fa fa-file-o" aria-hidden="true"></i></h1>
+            <p class="title">file.txt</p>
+        </div>
+    </div>
+</body>
+</html>

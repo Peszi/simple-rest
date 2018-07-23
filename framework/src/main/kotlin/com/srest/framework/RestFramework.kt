@@ -11,7 +11,7 @@ class RestFramework(
 ) {
 
     private val startTime = System.currentTimeMillis()
-    private val propertiesService: PropertiesService = PropertiesService()
+    private val propertiesService: PropertiesService = PropertiesService(baseClass)
     private val frameworkService: FrameworkService = FrameworkService(baseClass)
     private val requestService: RequestService = RequestService(propertiesService.getServerPort(), frameworkService)
 
